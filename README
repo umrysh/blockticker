@@ -1,0 +1,17 @@
+Welcome to blockticker
+
+
+This bash/php script will scrape http://blockorigin.pfoe.be every 5 minutes and display any new found blocks along with the pool that found them.
+
+It also keeps a log of all the blocks and their respective finders in the file BTCBlocks.txt for future reference.
+
+If you set the NAME variable in blockticker.sh to the name of your pool you will also get desktop notifications whenever your pool finds a block.
+
+
+How to use:
+
+sudo chmod +x blockticker.sh
+./blockticker.sh
+
+
+Enjoy!
