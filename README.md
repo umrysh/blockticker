@@ -1,7 +1,7 @@
 # Welcome to blockticker
 
 
-This bash/php script will scrape [blockorigin](http://blockorigin.pfoe.be) every 5 minutes and display any new found blocks along with the pool that found them.
+This bash/php script will scrape [blockorigin](http://blockorigin.pfoe.be) every 10 minutes and display any new found blocks along with the pool that found them.
 
 It also keeps a log of all the blocks and their respective finders in the file BTCBlocks.txt for future reference.
 
