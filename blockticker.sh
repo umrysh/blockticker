@@ -14,7 +14,8 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ALERT_IMAGE="$(dirname $0)/btc.png"
-NAME="F2pool"
+NAME="slush"
+NUMBER="5554443333"
 
 function Addcolor
 {
@@ -22,10 +23,18 @@ function Addcolor
   do
     if [[ "$DATA" =~ "$NAME" ]]
     then
-        # Notify Me
         BLOCK=`echo $DATA | cut -d '|' -f 1`
+        ######################################################################
+        # Leave the line below uncommented if you want desktop notifications #
+        ######################################################################
         DISPLAY=:0.0 XAUTHORITY=~/.Xauthority notify-send -i $ALERT_IMAGE -t 5000 --hint=int:transient:1 -- "Pool Won Block" "$BLOCK";
-        # Blue
+        ######################################################################
+        # Leave the line below uncommented if you want SMS notifications     #
+        ######################################################################
+        curl "http://textbelt.com/text" -d "number=$NUMBER" -d "message=$DATA" > /dev/null 2>&1
+        ######################################################################
+        # Color the text blue                                                #
+        ######################################################################
         echo -e "\e[1;34m$DATA\e[0m"
     else
         echo "$DATA"
@@ -38,7 +47,7 @@ cd $(dirname $0)
 while true
  do
   /usr/bin/php blockticker.php
-  sleep 5m
+  sleep 10m
  done
 ) &
 
