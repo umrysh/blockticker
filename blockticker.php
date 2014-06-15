@@ -60,7 +60,8 @@ if(file_exists('BTCBlocks.txt'))
     }
     fclose($f);
 
-    $lastBlock = trim(explode( "|" , $line )[0]);
+    $lastBlockArray = explode( "|" , $line);
+    $lastBlock = trim($lastBlockArray[0]);
 }else{
     $lastBlock = 0;
 }
