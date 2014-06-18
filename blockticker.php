@@ -12,8 +12,9 @@
 //
 //    You should have received a copy of the GNU General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+$ctx=stream_context_create(array('http'=> array( 'timeout' => 1200) )); 
 
-$data = file_get_contents('http://blockorigin.pfoe.be/blocklist.php');
+$data = file_get_contents('http://blockorigin.pfoe.be/blocklist.php', false,$ctx);
 
 $dom = new domDocument;
 
@@ -29,7 +30,7 @@ foreach ($rows as $row) {
     $cols = $row->getElementsByTagName('td');
     if($cols->item(0) && $cols->item(2) && $cols->item(0)->textContent!="" && $cols->item(2)->textContent !="")
     {
-        array_push($arr,array(str_replace("-","",trim($cols->item(0)->textContent)),str_replace("%","",trim($cols->item(2)->textContent))));
+        array_push($arr,array(str_replace("-","",trim($cols->item(0)->textContent)),str_replace("%","",trim($cols->item(2)->textContent)),$cols->item(1)->textContent));
     }
 }
 
@@ -62,8 +63,14 @@ if(file_exists('BTCBlocks.txt'))
 
     $lastBlockArray = explode( "|" , $line);
     $lastBlock = trim($lastBlockArray[0]);
+    if(count($lastBlockArray)>2){
+        $lastBlockTime = trim($lastBlockArray[1]);
+    }else{
+        $lastBlockTime = 0;
+    }
 }else{
     $lastBlock = 0;
+    $lastBlockTime = 0;
 }
 
 $f = fopen('BTCBlocks.txt', 'a');
@@ -71,7 +78,12 @@ $f = fopen('BTCBlocks.txt', 'a');
 foreach (array_reverse($arr) as $row) {
     if($row[0]>$lastBlock)
     {
-        fwrite($f, $row[0] . " | " . $row[1] . "\n");
+        // Get time of block
+        echo "Adding " . $row[0] . "\n";
+        $temp = json_decode(str_replace('\"','"',file_get_contents("http://blockchain.info/rawblock/".$row[2]."?format=json", false,$ctx)));
+
+        fwrite($f, $row[0] . " | " . $temp->time . " | " . ($temp->time-$lastBlockTime) . " | " . $row[1] . "\n");
+        $lastBlockTime = $temp->time;
     }
 }
 fclose($f);

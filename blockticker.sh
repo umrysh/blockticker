@@ -13,7 +13,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-ALERT_IMAGE="$(dirname $0)/btc.png"
+ALERT_IMAGE="/home/dave/bin/btc.png"
 NAME="slush"
 NUMBER="5554443333"
 
@@ -31,7 +31,7 @@ function Addcolor
         ######################################################################
         # Leave the line below uncommented if you want SMS notifications     #
         ######################################################################
-        curl "http://textbelt.com/text" -d "number=$NUMBER" -d "message=$DATA" > /dev/null 2>&1
+        #curl "http://textbelt.com/text" -d "number=$NUMBER" -d "message=$DATA" > /dev/null 2>&1
         ######################################################################
         # Color the text blue                                                #
         ######################################################################
@@ -42,19 +42,38 @@ function Addcolor
   done
 }
 
+# From http://stackoverflow.com/a/12199798
+convertsecs() {
+   ((m=(${1}%3600)/60))
+   ((s=${1}%60))
+   printf "%02d:%02d\n" $m $s
+}
+
+function ConvertDates
+{
+  while read DATA
+  do
+    BLOCK=`echo $DATA | cut -d '|' -f 1`
+    FOUNDTIME=`echo $DATA | cut -d '|' -f 2 | { read UNIXDATE ; date -d @$UNIXDATE; }`
+    DIFFTIME=`echo $DATA | cut -d '|' -f 3`
+    FOUNDER=`echo $DATA | cut -d '|' -f 4`
+    echo "$BLOCK - $FOUNDTIME - $(convertsecs $DIFFTIME) - $FOUNDER"
+  done
+}
+
 cd $(dirname $0)
 (
 while true
  do
-  /usr/bin/php blockticker.php
+  /usr/bin/php blockticker.php > /dev/null 2>&1
   sleep 10m
  done
 ) &
 
-printf "#################\n#  BlockTicker  #   [Ctrl+C] to stop.\n#################\n"
+printf "#################\n#  BlockTicker  #   [Ctrl+C] to stop.\n#################\nBlock              Time Found           Duration  Founder\n#########################################################\n"
 
 if [[ ! -f BTCBlocks.txt ]]; then
-    printf "File not found\nWaiting 15 seconds\n\n"
-    sleep 15
+    printf "File not found\nWaiting 5 minutes\n\n"
+    sleep 300
 fi
-tail -f BTCBlocks.txt | Addcolor
+tail -f BTCBlocks.txt | ConvertDates | Addcolor
